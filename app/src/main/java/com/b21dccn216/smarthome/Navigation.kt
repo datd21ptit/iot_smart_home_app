@@ -2,8 +2,6 @@ package com.b21dccn216.smarthome
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
@@ -14,12 +12,7 @@ import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.navigation.NavHostController
@@ -91,41 +84,25 @@ fun SmarthomeNavigation(
         startDestination = DASHBOARD
     ){
         composable(DASHBOARD) {
-            DashboardScreen(navController)
+            DashboardScreen(innerPadding = innerPaddingValues)
         }
 
         composable(SENSOR_DATA_TABLE){
-            var selectedIndex by remember{ mutableStateOf(1) }
             TableScreen(
                 modifier = Modifier.padding(innerPaddingValues),
-                tableData = table,
-                selectedIndex = selectedIndex,
-                title = "Sensor data",
-                onClick = {it, tittle ->
-                    selectedIndex = it
-                    navController.navigate(route = tittle)
-                }
+                tableData = table
             )
         }
 
         composable(ACTION_DATA_TABLE){
-            var selectedIndex by remember{ mutableStateOf(2) }
             TableScreen(
                 modifier = Modifier.padding(innerPaddingValues),
-                tableData = table,
-                selectedIndex = selectedIndex,
-                title = "Action",
-                onClick = {it, tittle ->
-                    selectedIndex = it
-                    navController.navigate(route = tittle)
-                }
+                tableData = table
             )
         }
 
         composable(PROFILE){
-            ProfileScreen(
-                modifier = Modifier,
-                navController = navController)
+            ProfileScreen(modifier = Modifier)
         }
     }
 }

@@ -4,7 +4,6 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -36,7 +35,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.rememberNavController
-import com.b21dccn216.smarthome.Destinations.PROFILE
 import com.b21dccn216.smarthome.ui.screen.DashboardScreen
 import com.b21dccn216.smarthome.ui.screen.SensorData
 import com.b21dccn216.smarthome.ui.screen.TableScreen
@@ -51,11 +49,38 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         setContent {
             val navController: NavHostController = rememberNavController()
+            var title by remember { mutableStateOf("Home") }
             SmartHomeTheme {
-                SmarthomeNavigation(
-                    navController = navController,
-                    innerPaddingValues = PaddingValues()
-                )
+                var selectedIndex by remember{ mutableStateOf(0)}
+                Scaffold(
+                    topBar = {
+                        TopAppBar(title = { Text(text = title) })
+                    },
+                    bottomBar = {
+                        NavigationBar() {
+                            items.forEachIndexed{ index, item ->
+                                NavigationBarItem(
+                                    selected = index == selectedIndex,
+                                    onClick = {
+                                        title = item.title
+                                        navController.navigate(route = item.title)
+                                        selectedIndex = index
+                                              },
+                                    icon = {
+                                        Icon(imageVector = if(index == selectedIndex) item.selectedIon else item.unselectedIcon,
+                                            contentDescription = null)
+                                    })
+                            }
+                        }
+                    }
+                ) { innerPadding ->
+//                    DashboardScreen(innerPadding = innerPadding)
+
+
+                    SmarthomeNavigation(
+                        navController = navController,
+                        innerPaddingValues = innerPadding)
+                }
 
             }
         }
