@@ -1,46 +1,36 @@
 package com.b21dccn216.smarthome
 
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.AccountCircle
 import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
+import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.PlayArrow
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.b21dccn216.smarthome.Destinations.ACTION_DATA_TABLE
-import com.b21dccn216.smarthome.Destinations.DASHBOARD
-import com.b21dccn216.smarthome.Destinations.PROFILE
-import com.b21dccn216.smarthome.Destinations.SENSOR_DATA_TABLE
+import com.b21dccn216.smarthome.model.Destinations.ACTION_DATA_TABLE
+import com.b21dccn216.smarthome.model.Destinations.DASHBOARD
+import com.b21dccn216.smarthome.model.Destinations.PROFILE
+import com.b21dccn216.smarthome.model.Destinations.SENSOR_DATA_TABLE
+import com.b21dccn216.smarthome.model.AppState.LOADING
+import com.b21dccn216.smarthome.model.TableUiState
 import com.b21dccn216.smarthome.ui.screen.DashboardScreen
+import com.b21dccn216.smarthome.ui.screen.LoadingScreen
 import com.b21dccn216.smarthome.ui.screen.ProfileScreen
-import com.b21dccn216.smarthome.ui.screen.SensorData
 import com.b21dccn216.smarthome.ui.screen.TableScreen
-
-object Destinations {
-    const val DASHBOARD = "Home"
-    const val SENSOR_DATA_TABLE = "Sensor"
-    const val ACTION_DATA_TABLE = "Action"
-    const val PROFILE = "Profile"
-}
 
 data class BottomNavigationItem(
     val title: String,
@@ -59,8 +49,8 @@ val items = listOf(
     ),
     BottomNavigationItem(
         SENSOR_DATA_TABLE,
-        selectedIon = Icons.Filled.Favorite,
-        unselectedIcon = Icons.Outlined.FavoriteBorder,
+        selectedIon = Icons.Filled.List,
+        unselectedIcon = Icons.Outlined.List,
         hasNews = false,
     ),
     BottomNavigationItem(
@@ -79,53 +69,77 @@ val items = listOf(
 
 @Composable
 fun SmarthomeNavigation(
-    innerPaddingValues: PaddingValues,
+    viewmodel: SmartHomeViewmodel,
     navController: NavHostController = rememberNavController()
 ){
+        NavHost(
+            navController = navController,
+            startDestination = DASHBOARD
+        ){
+            composable(DASHBOARD) {
+                DashboardScreen(
+                    viewmodel = viewmodel,
+                    onClickNavItem = {
+                        navController.navigate(route = it)
+                        viewmodel.navigateTo(screen = it)
+                    })
+            }
 
-    val table = mutableListOf<SensorData>()
-    (1..30).forEach{it-> table.add(SensorData(id = it, temp = 20, humid = 80, light = 80, time = "20-8"))}
-
-    NavHost(
-        navController = navController,
-        startDestination = DASHBOARD
-    ){
-        composable(DASHBOARD) {
-            DashboardScreen(navController)
-        }
-
-        composable(SENSOR_DATA_TABLE){
-            var selectedIndex by remember{ mutableStateOf(1) }
-            TableScreen(
-                modifier = Modifier.padding(innerPaddingValues),
-                tableData = table,
-                selectedIndex = selectedIndex,
-                title = "Sensor data",
-                onClick = {it, tittle ->
-                    selectedIndex = it
-                    navController.navigate(route = tittle)
+            composable(SENSOR_DATA_TABLE){
+                val uiState by viewmodel.uiStateTable.collectAsState()
+                val appState by viewmodel.appState.collectAsState()
+                if(appState == LOADING){
+                    LoadingScreen()
+                }else{
+                    TableScreen(
+                        modifier = Modifier,
+                        viewmodel = viewmodel,
+                        title = "Sensor data",
+                        titleColmn = listOf("temp", "humid", "light"),
+                        selectedIndex = 1,
+                        onClickNavItem = {tittle ->
+                            navController.navigate(route = tittle)
+                            viewmodel.navigateTo(screen = tittle)
+                        },
+                        onDateSelected = {
+                            viewmodel.moveToPage(uiState.copy(time = it))
+                        }
+                    )
                 }
-            )
-        }
 
-        composable(ACTION_DATA_TABLE){
-            var selectedIndex by remember{ mutableStateOf(2) }
-            TableScreen(
-                modifier = Modifier.padding(innerPaddingValues),
-                tableData = table,
-                selectedIndex = selectedIndex,
-                title = "Action",
-                onClick = {it, tittle ->
-                    selectedIndex = it
-                    navController.navigate(route = tittle)
-                }
-            )
-        }
+            }
 
-        composable(PROFILE){
-            ProfileScreen(
-                modifier = Modifier,
-                navController = navController)
+            composable(ACTION_DATA_TABLE){
+//            TableScreen(
+//                modifier = Modifier.padding(innerPaddingValues),
+//                tableData = table,
+//                selectedIndex = 2,
+//                title = "Action",
+//                onClick = {it, tittle ->
+////                    selectedIndex = it
+//                    navController.navigate(route = tittle)
+//                }
+//            )
+            }
+
+            composable(PROFILE){
+                ProfileScreen(
+                    modifier = Modifier,
+                    onClickNavItem = {
+                        navController.navigate(it)
+                        viewmodel.navigateTo(it)
+                    })
+            }
         }
-    }
+//    }else{
+//        Column(
+//            modifier = Modifier.fillMaxSize(),
+//            verticalArrangement = Arrangement.Center,
+//            horizontalAlignment = Alignment.CenterHorizontally
+//        ) {
+//            Text(text = "LOADING...",
+//                style = MaterialTheme.typography.titleMedium)
+//        }
+//    }
+
 }

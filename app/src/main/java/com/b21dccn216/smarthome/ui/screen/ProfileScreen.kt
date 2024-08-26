@@ -55,21 +55,20 @@ import com.b21dccn216.smarthome.items
 @Composable
 fun ProfileScreen(
     modifier: Modifier,
-    navController: NavController
+    onClickNavItem: (String) -> Unit,
 ){
-    var selectedIndex by remember{ mutableStateOf(3) }
+//    var selectedIndex by remember{ mutableStateOf(3) }
     Scaffold(
         bottomBar = {
             NavigationBar() {
                 items.forEachIndexed{ index, item ->
                     NavigationBarItem(
-                        selected = index == selectedIndex,
+                        selected = index == 3,
                         onClick = {
-                            navController.navigate(route = item.title)
-                            selectedIndex = index
+                            onClickNavItem(item.title)
                         },
                         icon = {
-                            Icon(imageVector = if(index == selectedIndex) item.selectedIon else item.unselectedIcon,
+                            Icon(imageVector = if(index == 3) item.selectedIon else item.unselectedIcon,
                                 contentDescription = null)
                         })
                 }
@@ -77,7 +76,7 @@ fun ProfileScreen(
         }
     ) { innerPadding ->
         Column(
-            modifier = modifier.fillMaxSize()//.padding(innerPadding)
+            modifier = modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())
 //            .background(color = Color.Gray.copy(alpha = 0.3f))
         ) {
             ImageProfile(modifier = Modifier)
@@ -168,5 +167,5 @@ private fun CreateImageProfile(modifier: Modifier = Modifier) {
 @Composable
 fun DefaultPreview() {
 
-    ProfileScreen(modifier = Modifier, navController = NavController(context = LocalContext.current))
+    ProfileScreen(modifier = Modifier, onClickNavItem = {})
 }
