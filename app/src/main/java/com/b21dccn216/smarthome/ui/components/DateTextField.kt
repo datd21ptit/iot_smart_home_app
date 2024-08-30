@@ -2,6 +2,7 @@ package com.b21dccn216.smarthome.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
@@ -9,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -35,14 +37,17 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDocked(
+    value: String,
     onDateSelected: (String) -> Unit, // Callback function to pass the selected date
     onDeselected: ()->Unit
 ) {
+    var tmp = value
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
         convertMillisToDate(it)
-    } ?: ""
+    } ?: tmp
+    tmp = ""
 
     // Trigger the callback with the selected date
     LaunchedEffect(selectedDate) {
@@ -92,10 +97,9 @@ fun DatePickerDocked(
                 onDismissRequest = { showDatePicker = false },
                 alignment = Alignment.Center
             ) {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .offset(y = 64.dp)
                         .shadow(elevation = 4.dp)
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(16.dp)
@@ -104,6 +108,9 @@ fun DatePickerDocked(
                         state = datePickerState,
                         showModeToggle = false
                     )
+                    Button(onClick = { showDatePicker = false }) {
+                        Text("Close")
+                    }
                 }
             }
         }

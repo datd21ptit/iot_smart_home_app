@@ -50,6 +50,7 @@ import androidx.constraintlayout.compose.Dimension
 import androidx.navigation.NavController
 import com.b21dccn216.smarthome.R
 import com.b21dccn216.smarthome.items
+import com.b21dccn216.smarthome.ui.components.BottomNavigationApp
 
 
 @Composable
@@ -60,19 +61,10 @@ fun ProfileScreen(
 //    var selectedIndex by remember{ mutableStateOf(3) }
     Scaffold(
         bottomBar = {
-            NavigationBar() {
-                items.forEachIndexed{ index, item ->
-                    NavigationBarItem(
-                        selected = index == 3,
-                        onClick = {
-                            onClickNavItem(item.title)
-                        },
-                        icon = {
-                            Icon(imageVector = if(index == 3) item.selectedIon else item.unselectedIcon,
-                                contentDescription = null)
-                        })
-                }
-            }
+            BottomNavigationApp(
+                onClickNavItem = { onClickNavItem(it) },
+                currentIndex = 3
+            )
         }
     ) { innerPadding ->
         Column(
@@ -127,7 +119,10 @@ private fun ImageProfile(
                 Text(text = "Nguyen Tran Dat",
                     style = MaterialTheme.typography.titleMedium
                 )
-                Text(text = "Ullum noster eu vis. Ius malorum feugait conclusionemque ex, mea an vocent tamquam vivendum. Vis amet vocent ne, no vix vidisse facilis. Te eam erant nominavi eloquentiam.",
+                Text(text = "B21DCCN216",
+                    modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp, top = 8.dp),
+                    textAlign = TextAlign.Center)
+                Text(text = "Link...",
                     modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp),
                     textAlign = TextAlign.Center)
             }

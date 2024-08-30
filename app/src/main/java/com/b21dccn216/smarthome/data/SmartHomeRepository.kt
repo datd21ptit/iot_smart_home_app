@@ -31,9 +31,9 @@ class SmartHomeRepository(
 
     suspend fun getSensorDataTable(
         uiState: TableUiState
-    ): TableResponse = apiService.getSensorTable(uiState.page, uiState.row1, uiState.row2, uiState.row3, uiState.time)
+    ): TableResponse = apiService.getSensorTable(uiState.page, uiState.row[0], uiState.row[1], uiState.row[2], uiState.time)
 
     suspend fun getActionDataTable(
         uiState: TableUiState
-    ): TableResponse = apiService.getActionTable(uiState.page, uiState.row1, uiState.row2, uiState.row3, uiState.time)
+    ): TableResponse = apiService.getActionTable(uiState.page, uiState.row[0], uiState.row[1], uiState.row[2], uiState.time)
 }

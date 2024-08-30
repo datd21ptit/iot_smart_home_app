@@ -2,12 +2,10 @@ package com.b21dccn216.smarthome
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountCircle
-import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.PlayArrow
 import androidx.compose.material.icons.outlined.AccountCircle
-import androidx.compose.material.icons.outlined.FavoriteBorder
 import androidx.compose.material.icons.outlined.Home
 import androidx.compose.material.icons.outlined.List
 import androidx.compose.material.icons.outlined.PlayArrow
@@ -16,7 +14,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.painterResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -26,7 +23,6 @@ import com.b21dccn216.smarthome.model.Destinations.DASHBOARD
 import com.b21dccn216.smarthome.model.Destinations.PROFILE
 import com.b21dccn216.smarthome.model.Destinations.SENSOR_DATA_TABLE
 import com.b21dccn216.smarthome.model.AppState.LOADING
-import com.b21dccn216.smarthome.model.TableUiState
 import com.b21dccn216.smarthome.ui.screen.DashboardScreen
 import com.b21dccn216.smarthome.ui.screen.LoadingScreen
 import com.b21dccn216.smarthome.ui.screen.ProfileScreen
@@ -86,7 +82,6 @@ fun SmarthomeNavigation(
             }
 
             composable(SENSOR_DATA_TABLE){
-                val uiState by viewmodel.uiStateTable.collectAsState()
                 val appState by viewmodel.appState.collectAsState()
                 if(appState == LOADING){
                     LoadingScreen()
@@ -101,25 +96,28 @@ fun SmarthomeNavigation(
                             navController.navigate(route = tittle)
                             viewmodel.navigateTo(screen = tittle)
                         },
-                        onDateSelected = {
-                            viewmodel.moveToPage(uiState.copy(time = it))
-                        }
                     )
                 }
 
             }
 
             composable(ACTION_DATA_TABLE){
-//            TableScreen(
-//                modifier = Modifier.padding(innerPaddingValues),
-//                tableData = table,
-//                selectedIndex = 2,
-//                title = "Action",
-//                onClick = {it, tittle ->
-////                    selectedIndex = it
-//                    navController.navigate(route = tittle)
-//                }
-//            )
+                val appState by viewmodel.appState.collectAsState()
+                if(appState == LOADING){
+                    LoadingScreen()
+                }else{
+                    TableScreen(
+                        modifier = Modifier,
+                        viewmodel = viewmodel,
+                        title = "Control data",
+                        titleColmn = listOf("led", "fan", "relay"),
+                        selectedIndex = 2,
+                        onClickNavItem = {title ->
+                            navController.navigate(route = title)
+                            viewmodel.navigateTo(screen = title)
+                        },
+                    )
+                }
             }
 
             composable(PROFILE){

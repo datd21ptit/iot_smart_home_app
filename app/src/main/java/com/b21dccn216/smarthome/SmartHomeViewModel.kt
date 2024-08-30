@@ -10,6 +10,7 @@ import com.b21dccn216.smarthome.data.SmartHomeRepository
 import com.b21dccn216.smarthome.model.AppState.LOADED
 import com.b21dccn216.smarthome.model.AppState.LOADING
 import com.b21dccn216.smarthome.model.DashboarUiState
+import com.b21dccn216.smarthome.model.Destinations.ACTION_DATA_TABLE
 import com.b21dccn216.smarthome.model.TableResponse
 import com.b21dccn216.smarthome.model.TableUiState
 import kotlinx.coroutines.delay
@@ -29,6 +30,7 @@ class SmartHomeViewmodel(
 
     private val _appState = MutableStateFlow(LOADING)
     val appState = _appState.asStateFlow()
+
     private val _uiStateTable = MutableStateFlow(
         TableUiState(
             tableData = TableResponse(
@@ -41,87 +43,90 @@ class SmartHomeViewmodel(
     )
     val uiStateTable: StateFlow<TableUiState> = _uiStateTable.asStateFlow()
 
+
     private val _currentScreen = MutableStateFlow(DASHBOARD)
 
-    init {
-        viewModelScope.launch {
-            initDeviceState()
-//            val result = repository.getSensorDataTable(_uiStateTable.value)
-//            _uiStateTable.update { value ->
-//                value.copy(
-//                    tableData = result
-//                )
-//            }
-        }.invokeOnCompletion {
-            _appState.value = LOADED
-        }
 
+//    INIT
+    init {
         viewModelScope.launch {
             _currentScreen.collectLatest{ current ->
                 when(current){
-                    DASHBOARD -> getDashboardData()
-                    SENSOR_DATA_TABLE -> getTableData()
+                    DASHBOARD -> {
+                        while(current == DASHBOARD){
+                            getDashboardData()
+                            delay(2000)
+                        }
+                    }
+                    SENSOR_DATA_TABLE -> {
+                        while (current == SENSOR_DATA_TABLE){
+                            getTableData()
+                            delay(2000)
+                        }
+                    }
+                    ACTION_DATA_TABLE -> {
+                        while (current == ACTION_DATA_TABLE){
+                            getTableDataAction()
+                            delay(2000)
+                        }
+                    }
+
                 }
             }
         }
     }
 
-    private fun getTableData(){
-        viewModelScope.launch {
-            while (_currentScreen.value == SENSOR_DATA_TABLE){
-                try{
-                    val result = repository.getSensorDataTable(_uiStateTable.value)
-                    _uiStateTable.update { value ->
-                        value.copy(
-                            tableData = result
-                        )
-                    }
-                    _appState.value = LOADED
-                    Log.d("viewmodel", "get table data")
-                }catch (e: Exception){
-                    Log.e("viewmodel", e.toString())
-                }
-                delay(2000)
-            }
-        }
-    }
-    private fun getDashboardData(){
-        viewModelScope.launch {
-            while(_currentScreen.value == DASHBOARD){
-                try {
-                    val listResult = repository.getSensorData()
-                    _uiStateDashboard.update { value ->
-                        value.copy(
-                            temp = listResult[0].temp,
-                            humid = listResult[0].humid,
-                            light = listResult[0].light,
-                        ).also {
-                            value.listTemp.add(listResult[0].temp)
-                            value.listHumid.add(listResult[0].humid)
-                            value.listLight.add(listResult[0].light)
-                            value.listHumid.removeAt(0)
-                            value.listTemp.removeAt(0)
-                            value.listHumid.removeAt(0)
-                        }
-                    }
-                    Log.d("viewmodel", uiStateDashboard.value.listTemp.size.toString())
-                }catch (e: Exception){
-                    Log.e("viewmodel", e.toString())
-                }
-                delay(2000)
-            }
-        }
-    }
-    private suspend fun initDeviceState(){
-        try {
-            val ret: DashboarUiState = repository.getSensorData()[0]
-            _uiStateDashboard.update { newValue ->
-                newValue.copy(
-                    led = ret.led,
-                    fan = ret.fan,
-                    relay = ret.relay
+    private suspend fun getTableData(){
+        try{
+            val result = repository.getSensorDataTable(_uiStateTable.value)
+            _uiStateTable.update { value ->
+                value.copy(
+                    tableData = result
                 )
             }
+            _appState.value = LOADED
+            Log.d("viewmodel", "get sensor data table")
+        }catch (e: Exception){
+            Log.e("viewmodel", e.toString())
+        }
+    }
+
+    private suspend fun getTableDataAction(){
+        try{
+            val result = repository.getActionDataTable(_uiStateTable.value)
+            _uiStateTable.update { value ->
+                value.copy(
+                    tableData = result
+                )
+            }
+            _appState.value = LOADED
+            Log.d("viewmodel", "get action table")
+        }catch (e: Exception){
+            Log.e("viewmodel", e.toString())
+        }
+    }
+
+    private suspend fun getDashboardData(){
+        try {
+            val listResult = repository.getSensorData()
+            _uiStateDashboard.update { value ->
+                value.copy(
+                    temp = listResult[0].temp,
+                    humid = listResult[0].humid,
+                    light = listResult[0].light,
+                )
+            }
+            getChartData()
+            _appState.value = LOADED
+            Log.d("viewmodel", uiStateDashboard.value.listTemp.size.toString())
+        }catch (e: Exception){
+            Log.e("viewmodel", e.toString())
+        }
+
+    }
+
+    private suspend fun getChartData(){
+        try {
             val listTemp = repository.getChartData("temp").toMutableList()
             listTemp.removeIf{ it == 0}
             _uiStateDashboard.update { newValue ->
@@ -133,12 +138,10 @@ class SmartHomeViewmodel(
                 newValue.copy(listHumid = listHumid)
             }
             val listLight = repository.getChartData("light").toMutableList()
-            listLight.removeIf{ it == 0}
             _uiStateDashboard.update { newValue ->
                 newValue.copy(listLight = listLight)
             }
-
-            Log.e("viewmodel", "init device state function")
+            Log.e("viewmodel", "get Chart data")
         }catch (e: Exception){
             Log.e("viewmodel", e.toString())
         }
@@ -168,19 +171,20 @@ class SmartHomeViewmodel(
 
     fun navigateTo(screen: String){
         _currentScreen.value = screen
-        if(screen != DASHBOARD){
-            _appState.value = LOADING
+        _uiStateTable.update { value ->
+            value.copy(
+                page = "1",
+                row = listOf("", "", ""),
+                time = "",
+            )
         }
-
     }
 
-    fun moveToPage(state: TableUiState){
+    fun addFilter(state: TableUiState){
         _uiStateTable.update { value ->
             value.copy(
                 page = state.page,
-                row1 = state.row1,
-                row2 = state.row2,
-                row3 = state.row3,
+                row = state.row,
                 time = state.time
             )
         }

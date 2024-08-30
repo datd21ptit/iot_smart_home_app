@@ -12,7 +12,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 private const val BASE_URL =
-    "http://192.168.1.8:3001"
+    "http://192.168.1.7:3001"
 
 /**
  * Use the Retrofit builder to build a retrofit object using a kotlinx.serialization converter

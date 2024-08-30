@@ -27,22 +27,19 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.b21dccn216.smarthome.SmartHomeViewmodel
 import com.b21dccn216.smarthome.R
+import com.b21dccn216.smarthome.data.ApiService
+import com.b21dccn216.smarthome.data.SmartHomeRepository
+import com.b21dccn216.smarthome.data.retrofit
 import com.b21dccn216.smarthome.items
 import com.b21dccn216.smarthome.model.AppState.LOADING
 import com.b21dccn216.smarthome.model.DashboarUiState
 import com.b21dccn216.smarthome.model.SensorType
 import com.b21dccn216.smarthome.ui.components.ActionBox
+import com.b21dccn216.smarthome.ui.components.BottomNavigationApp
 import com.b21dccn216.smarthome.ui.components.ChartData
 import com.b21dccn216.smarthome.ui.components.LineChartComponent
 import com.b21dccn216.smarthome.ui.components.SensorInformationBox
-val chartData = listOf(
-    ChartData("T", 30),
-    ChartData("W", 25),
-    ChartData("F", 30),
-    ChartData("SA", 20),
-    ChartData("SU", 22),
-    ChartData("M", 13),
-)
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DashboardScreen(
@@ -59,18 +56,10 @@ fun DashboardScreen(
             TopAppBar(title = { Text(text = "Dashboard") })
         },
         bottomBar = {
-            NavigationBar {
-                items.forEachIndexed{ index, item ->
-                    NavigationBarItem(
-                        selected = index == 0,
-                        onClick = { onClickNavItem(item.title) },
-                        icon = {
-                            Icon(
-                                imageVector = if(index == 0) item.selectedIon else item.unselectedIcon,
-                                contentDescription = null)
-                        })
-                }
-            }
+            BottomNavigationApp(
+                onClickNavItem = { onClickNavItem(it) },
+                currentIndex = 0,
+            )
         }
     ){ innerPadding ->
         LazyVerticalGrid(
@@ -137,10 +126,6 @@ fun DashboardScreen(
     }
 
     }
+
 }
 
-@Composable
-@Preview(showBackground = true)
-fun DashboardScreenPreview(){
-//    DashboardScreen()
-}
