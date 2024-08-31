@@ -56,23 +56,13 @@ import com.b21dccn216.smarthome.ui.components.BottomNavigationApp
 @Composable
 fun ProfileScreen(
     modifier: Modifier,
-    onClickNavItem: (String) -> Unit,
+    innerPadding: PaddingValues
 ){
-//    var selectedIndex by remember{ mutableStateOf(3) }
-    Scaffold(
-        bottomBar = {
-            BottomNavigationApp(
-                onClickNavItem = { onClickNavItem(it) },
-                currentIndex = 3
-            )
-        }
-    ) { innerPadding ->
-        Column(
-            modifier = modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())
+    Column(
+        modifier = modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())
 //            .background(color = Color.Gray.copy(alpha = 0.3f))
-        ) {
-            ImageProfile(modifier = Modifier)
-        }
+    ) {
+        ImageProfile(modifier = Modifier)
     }
 }
 
@@ -161,6 +151,5 @@ private fun CreateImageProfile(modifier: Modifier = Modifier) {
 @Preview(showBackground = true)
 @Composable
 fun DefaultPreview() {
-
-    ProfileScreen(modifier = Modifier, onClickNavItem = {})
+    ProfileScreen(modifier = Modifier, PaddingValues())
 }

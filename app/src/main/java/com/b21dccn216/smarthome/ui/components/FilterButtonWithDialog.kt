@@ -17,13 +17,12 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -31,13 +30,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import com.b21dccn216.smarthome.SmartHomeViewmodel
-import com.b21dccn216.smarthome.model.TableUiState
 
 
 @Composable
 fun FilterButtonWithDialog(
     selectedFilters: List<String>,
+    titleColumn: List<String>,
     onClearALl: () -> Unit,
     onvalueChange: (Int, String) -> Unit,
     onConfirmClick: () -> Unit,
@@ -55,9 +53,9 @@ fun FilterButtonWithDialog(
             .padding(8.dp),
         colors = ButtonColors(
             containerColor = Color(0xFF179BAE),
-            contentColor = androidx.compose.ui.graphics.Color.Black,
+            contentColor = Color.Black,
             disabledContainerColor = MaterialTheme.colorScheme.onSurface,
-            disabledContentColor = androidx.compose.ui.graphics.Color.Black
+            disabledContentColor = Color.Black
         ),
         onClick = { showDialog = true
                   Log.d("datatable", selectedFilters.toString())},
@@ -79,6 +77,7 @@ fun FilterButtonWithDialog(
             title = { Text("Filter Options") },
             text = {
                 FillterDialog(
+                    titleColumn = titleColumn,
                     onClearALl = {
                         onClearALl()
                         showDialog = false },
@@ -87,7 +86,7 @@ fun FilterButtonWithDialog(
                     },
                     selectedFilters = selectedFilters,
                     selectedDate = selectedDate,
-                    onDateSelected = {it -> onDateChange(it) },
+                    onDateSelected = { onDateChange(it) },
                     onDeselected = { onDateChange("")}
                 )
             },
@@ -109,24 +108,29 @@ fun FilterButtonWithDialog(
 
 @Composable
 fun FillterDialog(
+    titleColumn: List<String>,
     onClearALl: () -> Unit,
     selectedFilters: List<String>,
     onvalueChange: (Int, String) -> Unit,
     selectedDate: String,
     onDateSelected: (String) -> Unit,
-    onDeselected: () -> Unit
+    onDeselected: () -> Unit,
+
 ){
     Column {
         Text(
             "Clear All",
-            modifier = Modifier.clickable {
+            color = Color.Red.copy(alpha = 0.5f),
+            style = MaterialTheme.typography.titleSmall,
+            modifier = Modifier.padding(bottom = 8.dp).clickable {
                 onClearALl()
             })
-        Divider()
+        HorizontalDivider()
         // Filter options for rows
         for (row in 0..2) {
             OutlinedTextField(
-                value = selectedFilters[row], onValueChange = { it ->
+                label = { Text(titleColumn[row]) },
+                value = selectedFilters[row], onValueChange = {
                     onvalueChange(row, it)
                 },
                 modifier = Modifier.padding(bottom = 8.dp),
@@ -137,7 +141,7 @@ fun FillterDialog(
             onDateSelected = {onDateSelected(it)},
             onDeselected = {onDeselected()}
         )
-        Divider()
+        HorizontalDivider()
         // Date picker
 
     }

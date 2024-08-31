@@ -34,7 +34,7 @@ fun SensorInformationBox(
     ConstraintLayout(
         modifier = Modifier
             .size(width = 165.dp, 100.dp)
-            .shadow(elevation = 1.dp, shape = RoundedCornerShape(15))
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(15))
             .clip(RoundedCornerShape(percent = 15))
             .background(color = Color.White)
     ){

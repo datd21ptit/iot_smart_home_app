@@ -1,6 +1,5 @@
 package com.b21dccn216.smarthome.ui.screen
 
-import android.util.Log
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,6 +11,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -21,13 +21,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.NavigationBar
-import androidx.compose.material3.NavigationBarItem
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,170 +35,157 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.b21dccn216.smarthome.SmartHomeViewmodel
-import com.b21dccn216.smarthome.items
-import com.b21dccn216.smarthome.ui.components.BottomNavigationApp
+import com.b21dccn216.smarthome.model.TableResponse
 import com.b21dccn216.smarthome.ui.components.FilterButtonWithDialog
 import com.b21dccn216.smarthome.ui.components.FilterChip
+//const val column1Weight = .4f
+//const val column2Weight = .7f
+//const val column3Weight = .3f
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TableScreen(
-    modifier: Modifier,
     viewmodel: SmartHomeViewmodel,
-    titleColmn: List<String>,
-    title: String,
-    selectedIndex: Int,
-    onClickNavItem: (String) -> Unit,
+    titleColumn: List<String>,
+    innerPadding: PaddingValues,
+    tableData: TableResponse
 ) {
     val uiState by viewmodel.uiStateTable.collectAsState()
-    val tableData = uiState.tableData
-    val column1Weight = .4f
-    val column2Weight = .7f
-    val column3Weight = .3f
-    Scaffold(
-        topBar = {
-            TopAppBar(title = { Text(text = title) })
-        },
-        bottomBar = {
-            BottomNavigationApp(
-                onClickNavItem = { onClickNavItem(it) },
-                currentIndex = selectedIndex
-            )
-        }
-    ){ innerPadding ->
-        Column(
-            modifier = Modifier.padding(
-                top = innerPadding.calculateTopPadding(),
+
+    Column(
+        modifier = Modifier
+            .padding(top = innerPadding.calculateTopPadding(),
                 bottom = innerPadding.calculateBottomPadding(),
-                start = 8.dp, end = 8.dp)
+                start = 8.dp, end = 8.dp
+            )
+    ){
+        var selectedFilters by remember{ mutableStateOf(uiState.row) }
+        var selectedDate by remember{ mutableStateOf(uiState.time) }
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Start
         ){
-            var selectedFilters by remember{ mutableStateOf(uiState.row) }
-            var selectedDate by remember{ mutableStateOf(uiState.time) }
-
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.Start
-            ){
-                FilterButtonWithDialog(
-                    selectedFilters = selectedFilters,
-                    selectedDate = selectedDate,
-                    onvalueChange = { row, value ->
-                        selectedFilters = selectedFilters.mapIndexed { index, it ->
-                            if (index == row) value else it
-                        }
-                    },
-                    onClearALl = {
-                        selectedFilters = listOf("", "", "")
-                        selectedDate = ""
-                        viewmodel.addFilter(uiState.copy(row = listOf("", "", ""), time = ""))
-                    },
-                    onConfirmClick = {
-                        viewmodel.addFilter(viewmodel.uiStateTable.value.copy(row = selectedFilters, time = selectedDate))
-                    },
-                    onDateChange = {
-                        selectedDate = it
-                        viewmodel.addFilter(uiState.copy(it))}
-                )
-
-                LazyRow {
-                    uiState.row.forEachIndexed { index, value ->
-                        if(value.isNotEmpty()){
-                            item {
-                                FilterChip(text = titleColmn[index] + " = " + value,
-                                    onClose = {
-                                        viewmodel.addFilter(uiState.copy(row = getList(index, uiState.row) ))
-                                        selectedFilters = getList(index, uiState.row)
-                                    }
-
-                                )
-                            }
-                        }
-                    }
-                    if(uiState.time.isNotEmpty()){
-                        item{
-                            FilterChip(text = "Time: " + uiState.time, onClose = {
-                                viewmodel.addFilter(uiState.copy(time = ""))
-                                selectedDate = ""
-                            }
+            FilterButtonWithDialog(
+                selectedFilters = selectedFilters,
+                selectedDate = selectedDate,
+                titleColumn = titleColumn,
+                onvalueChange = { row, value ->
+                    val updateList = selectedFilters.toMutableList()
+                    updateList[row] = value
+                    selectedFilters = updateList
+                },
+                onClearALl = {
+                    selectedFilters = listOf("", "", "")
+                    selectedDate = ""
+                    viewmodel.addFilter(uiState.copy(row = listOf("", "", ""), time = ""))
+                },
+                onConfirmClick = {
+                    viewmodel.addFilter(uiState.copy(row = selectedFilters, time = selectedDate))
+                },
+                onDateChange = {
+                    selectedDate = it
+                    viewmodel.addFilter(uiState.copy(time = it))
+                }
+            )
+            LazyRow {
+                uiState.row.forEachIndexed { index, value ->
+                    if(value.isNotEmpty()){
+                        item {
+                            FilterChip(text = titleColumn[index] + " = " + value,
+                                onClose = {
+                                    val updateList = uiState.row.toMutableList()
+                                    updateList[index] = ""
+                                    viewmodel.addFilter(uiState.copy(row = updateList ))
+                                    selectedFilters = updateList
+                                }
                             )
                         }
                     }
-
                 }
-            }
-
-            Row(
-                modifier = Modifier.background(color =Color(0xFF179BAE),
-                    shape = RoundedCornerShape(topStart = 15.dp, topEnd = 15.dp))
-            ) {
-                TableCell(text = "id", weight = column1Weight,
-                    modifier = Modifier
-                        .clip(shape = RoundedCornerShape(topStart = 15.dp))
-                )
-                TableCell(text = titleColmn[0], weight = column3Weight)
-                TableCell(text = titleColmn[1], weight = column3Weight)
-                TableCell(text = titleColmn[2], weight = column3Weight)
-                TableCell(text = "Time", weight = column2Weight,
-                    modifier = Modifier
-                        .clip(shape = RoundedCornerShape(topEnd = 15.dp))
-                )
-            }
-
-            LazyColumn(Modifier.fillMaxSize()) {
-                items(tableData.data) {
-                    Row(Modifier.fillMaxWidth()) {
-                        TableCell(text = it[0], weight = column1Weight)
-                        TableCell(text = it[1], weight = column3Weight)
-                        TableCell(text = it[2], weight = column3Weight)
-                        TableCell(text = it[3], weight = column3Weight)
-                        TableCell(text = it[4], weight = column2Weight)
+                if(uiState.time.isNotEmpty()){
+                    item{
+                        FilterChip(text = "Time: " + uiState.time, onClose = {
+                            viewmodel.addFilter(uiState.copy(time = ""))
+                            selectedDate = ""
+                        }
+                        )
                     }
                 }
-                item{
-                    LazyRow(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(8.dp),
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        contentPadding = PaddingValues(horizontal = 4.dp)
-                    ) {
-                        (1..tableData.totalPages).forEach{ index ->
-                            item(){
-                                PageButton(
-                                    onPageSelected = {viewmodel.addFilter(uiState.copy(page = it.toString()))},
-                                    index = index,
-                                    pageIndex = tableData.page
-                                )
-                            }
+            } // Filter Chip
+        }
+//        Title Row
+        TitleRow(titleColumn)
+        LazyColumn(Modifier.fillMaxSize()) {
+//            Rows
+            items(tableData.data) {
+                TableRow(it = it)
+            }
+//            Page button
+            item{
+                LazyRow(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    contentPadding = PaddingValues(horizontal = 4.dp)
+                ) {
+                    (1..tableData.totalPages).forEach{ index ->
+                        item {
+                            PageButton(
+                                onPageSelected = {viewmodel.addFilter(uiState.copy(page = index.toString()))},
+                                isPageDisplay = tableData.page == index,
+                                page = index
+                            )
                         }
                     }
                 }
             }
         }
     }
-
 }
 
-
-fun getList(index: Int, listS: List<String>): List<String> {
-    var list = listS.toMutableList()
-    if(index in list.indices){
-        list[index] = ""
+@Composable
+fun TitleRow(
+    titleColumn: List<String>
+){
+    Row(
+        modifier = Modifier
+            .clip(shape = RoundedCornerShape(topStart = 20.dp, topEnd = 20.dp))
+            .border(BorderStroke(1.dp, Color.Black), shape = RoundedCornerShape(topEnd = 20.dp, topStart = 20.dp))
+            .background(Color(0xFF179BAE))
+    ) {
+        TableCell(text = "Id", weight = .4f)
+        TableCell(text = titleColumn[0], weight = .3f)
+        TableCell(text = titleColumn[1], weight = .3f)
+        TableCell(text = titleColumn[2], weight = .3f)
+        TableCell(text = "Time", weight = .7f)
     }
-    Log.e("datatable", list.toString())
-    return list
 }
+
+@Composable
+fun TableRow(
+    it: List<String>
+){
+    Row(Modifier.fillMaxWidth()) {
+        TableCell(text = it[0], weight = .4f)
+        TableCell(text = it[1], weight = .3f)
+        TableCell(text = it[2], weight = .3f)
+        TableCell(text = it[3], weight = .3f)
+        TableCell(text = it[4], weight = .7f)
+    }
+}
+
 @Composable
 fun PageButton(
-    onPageSelected: (Int) -> Unit,
-    index: Int,
-    pageIndex: Int
+    onPageSelected: () -> Unit,
+    isPageDisplay: Boolean,
+    page: Int
 ){
     Button(
-        onClick = { onPageSelected(index) },
+        onClick = { onPageSelected() },
         shape = RoundedCornerShape(5.dp),
         modifier = Modifier
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(5.dp))
@@ -217,10 +198,10 @@ fun PageButton(
         contentPadding = PaddingValues(),
         border = BorderStroke(
             width = 2.dp,
-            color = if(pageIndex == index) Color.Black else Color.Transparent
+            color = if(isPageDisplay) Color.Black else Color.Transparent
         )
     ) {
-        Text(text = index.toString())
+        Text(text = page.toString())
     }
 }
 

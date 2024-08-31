@@ -9,7 +9,7 @@ import com.b21dccn216.smarthome.items
 
 @Composable
 fun BottomNavigationApp(
-    onClickNavItem: (String) -> Unit,
+    onClickNavItem: (Pair<Int, String>) -> Unit,
     currentIndex: Int
 ){
     NavigationBar {

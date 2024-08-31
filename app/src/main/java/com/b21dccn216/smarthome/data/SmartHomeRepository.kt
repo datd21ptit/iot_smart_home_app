@@ -25,9 +25,9 @@ class SmartHomeRepository(
         return apiService.sendAction(led.toString(),relay.toString(), fan.toString())
     }
 
-    suspend fun getChartData(type: String): List<Int>{
-        return apiService.getChartData(type)
-    }
+//    suspend fun getChartData(type: String): List<Int>{
+//        return apiService.getChartData(type)
+//    }
 
     suspend fun getSensorDataTable(
         uiState: TableUiState

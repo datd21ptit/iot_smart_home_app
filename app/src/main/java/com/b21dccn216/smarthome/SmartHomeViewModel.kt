@@ -25,28 +25,18 @@ class SmartHomeViewmodel(
     private val repository: SmartHomeRepository
 ) : ViewModel(){
 
-    private val _uiStateDashboard = MutableStateFlow(DashboarUiState())
+    private var _uiStateDashboard = MutableStateFlow(DashboarUiState())
     val uiStateDashboard: StateFlow<DashboarUiState> = _uiStateDashboard.asStateFlow()
 
     private val _appState = MutableStateFlow(LOADING)
     val appState = _appState.asStateFlow()
 
-    private val _uiStateTable = MutableStateFlow(
-        TableUiState(
-            tableData = TableResponse(
-                data = listOf(listOf("id", "row1", "row2", "row3", "time")),
-                page = 1,
-                totalRows = 100,
-                totalPages = 10
-                )
-        )
-    )
+    private val _uiStateTable = MutableStateFlow(TableUiState())
     val uiStateTable: StateFlow<TableUiState> = _uiStateTable.asStateFlow()
 
 
-    private val _currentScreen = MutableStateFlow(DASHBOARD)
-
-
+    private var _currentScreen = MutableStateFlow(DASHBOARD)
+    val currentScreen = _currentScreen.asStateFlow()
 //    INIT
     init {
         viewModelScope.launch {
@@ -81,7 +71,7 @@ class SmartHomeViewmodel(
             val result = repository.getSensorDataTable(_uiStateTable.value)
             _uiStateTable.update { value ->
                 value.copy(
-                    tableData = result
+                    tableSensorData = result
                 )
             }
             _appState.value = LOADED
@@ -96,7 +86,7 @@ class SmartHomeViewmodel(
             val result = repository.getActionDataTable(_uiStateTable.value)
             _uiStateTable.update { value ->
                 value.copy(
-                    tableData = result
+                    tableActionData = result
                 )
             }
             _appState.value = LOADED
@@ -108,45 +98,43 @@ class SmartHomeViewmodel(
 
     private suspend fun getDashboardData(){
         try {
-            val listResult = repository.getSensorData()
-            _uiStateDashboard.update { value ->
-                value.copy(
-                    temp = listResult[0].temp,
-                    humid = listResult[0].humid,
-                    light = listResult[0].light,
-                )
+            val listResult = repository.getSensorData()[0]
+            _uiStateDashboard.update {
+                listResult
             }
-            getChartData()
+            Log.d("viewmodel", listResult.toString())
+//            getChartData()
             _appState.value = LOADED
-            Log.d("viewmodel", uiStateDashboard.value.listTemp.size.toString())
         }catch (e: Exception){
             Log.e("viewmodel", e.toString())
         }
-
     }
 
-    private suspend fun getChartData(){
-        try {
-            val listTemp = repository.getChartData("temp").toMutableList()
-            listTemp.removeIf{ it == 0}
-            _uiStateDashboard.update { newValue ->
-                newValue.copy(listTemp = listTemp)
-            }
-            val listHumid = repository.getChartData("humid").toMutableList()
-            listHumid.removeIf{ it == 0}
-            _uiStateDashboard.update { newValue ->
-                newValue.copy(listHumid = listHumid)
-            }
-            val listLight = repository.getChartData("light").toMutableList()
-            _uiStateDashboard.update { newValue ->
-                newValue.copy(listLight = listLight)
-            }
-            Log.e("viewmodel", "get Chart data")
-        }catch (e: Exception){
-            Log.e("viewmodel", e.toString())
-        }
-
-    }
+//    private suspend fun getChartData(){
+//        try {
+//            val listTemp = repository.getChartData("temp").toMutableList()
+//            listTemp.removeIf{ it == 0}
+//            _uiStateDashboard.update { newValue ->
+//                newValue.copy(listTemp = listTemp,
+//                    temp = listTemp[listTemp.lastIndex])
+//            }
+//            val listHumid = repository.getChartData("humid").toMutableList()
+//            listHumid.removeIf{ it == 0}
+//            _uiStateDashboard.update { newValue ->
+//                newValue.copy(listHumid = listHumid,
+//                    humid = listHumid[listHumid.lastIndex])
+//            }
+//            val listLight = repository.getChartData("light").toMutableList()
+//            _uiStateDashboard.update { newValue ->
+//                newValue.copy(listLight = listLight,
+//                    light = listLight[listLight.lastIndex])
+//            }
+//            Log.e("viewmodel", "get Chart data")
+//        }catch (e: Exception){
+//            Log.e("viewmodel", e.toString())
+//        }
+//
+//    }
 
 
     fun clickAction(state: DashboarUiState){
@@ -169,7 +157,7 @@ class SmartHomeViewmodel(
         }
     }
 
-    fun navigateTo(screen: String){
+    fun navigateTo(screen: Pair<Int, String>){
         _currentScreen.value = screen
         _uiStateTable.update { value ->
             value.copy(
