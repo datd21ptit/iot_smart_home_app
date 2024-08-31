@@ -6,43 +6,29 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardColors
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.focus.focusModifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.Color.Companion.Cyan
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.PointMode
-import androidx.compose.ui.graphics.StrokeCap
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import kotlin.math.abs
-import kotlin.math.round
 import kotlin.math.roundToInt
 
 data class ChartData(
@@ -53,16 +39,15 @@ data class ChartData(
 
 @Composable
 fun LineChart(
-    data: List<ChartData>,
+    yAxisData: List<Int>,
     height: Dp = 340.dp,
-    step: Int = 100,
+    step: Int = 2,
     colorChart: Color = Color.Blue
 ){
     val xAxisPadding = 16.dp
     val yAxisPadding = 16.dp
 
-    val xAxisData = data.map{it.x}
-    val yAxisData = data.map{it.y}
+//    val yAxisData = data.map{it.y}
     
     val offsetList = remember { mutableListOf<Offset>() }
 
@@ -74,35 +59,52 @@ fun LineChart(
         val gridHeight = height.toPx() - yAxisPadding.toPx()*3
         val gridWidth = size.width
 
-        var absMaxYPoint = yAxisData.maxByOrNull { it.toFloat().roundToInt() } ?:0
+        var absMaxYPoint = yAxisData.maxByOrNull { it } ?:0
+
+        val tempMin = yAxisData.minByOrNull { it } ?:0
+
+        val minYAxis = tempMin - tempMin%step
         val yAxisLabelList = mutableListOf<String>()
 
-        var tmp = 0
+
+        var tmp = minYAxis
         while(tmp <= absMaxYPoint){
             yAxisLabelList.add(tmp.toString())
             tmp += step
         }
         yAxisLabelList.add(tmp.toString())
 
-        val xAxisSpacing = (gridWidth - xAxisPadding.toPx()) / (data.size - 1)
+        val xAxisSpacing = (gridWidth - xAxisPadding.toPx()) / (yAxisData.size - 1)
         val yAxisSpacing = gridHeight / (yAxisLabelList.size - 1)
 
         offsetList.clear()
-        for(i in 0 until data.size){
+        for(i in 0 until yAxisData.size){
             val x = i * xAxisSpacing + xAxisPadding.toPx()
-            val y = gridHeight - (yAxisSpacing * (yAxisData[i].toFloat() / step))
+            val y = gridHeight - (yAxisSpacing * ((yAxisData[i].toFloat() - minYAxis) / step))
             offsetList.add(Offset(x,y))
         }
 //        draw vertical grid
-        for(i in 0 until data.size){
-            val xOffset = (xAxisSpacing * i) + xAxisPadding.toPx()
-            drawLine(
-                color = if(i == 0 || i == data.size-1) Color.Black else Color.Gray.copy(alpha = 0.3f),
-                start = Offset(xOffset, 0f),
-                end = Offset(xOffset, gridHeight),
-                strokeWidth = 2f
-            )
-        }
+        drawLine(
+            color = Color.Black,
+            start = Offset(xAxisPadding.toPx() + xAxisSpacing*(yAxisData.size-1), 0f),
+            end = Offset(xAxisPadding.toPx() + xAxisSpacing*(yAxisData.size-1), gridHeight),
+            strokeWidth = 2f
+        )
+        drawLine(
+            color = Color.Black,
+            start = Offset(xAxisPadding.toPx(), 0f),
+            end = Offset(xAxisPadding.toPx(), gridHeight),
+            strokeWidth = 2f
+        )
+//        for(i in 0 until data.size){
+//            val xOffset = (xAxisSpacing * i) + xAxisPadding.toPx()
+//            drawLine(
+//                color = if(i == 0 || i == data.size-1) Color.Black else Color.Gray.copy(alpha = 0.3f),
+//                start = Offset(xOffset, 0f),
+//                end = Offset(xOffset, gridHeight),
+//                strokeWidth = 2f
+//            )
+//        }
 
 //        draw horizon grid
         for(i in 0 until yAxisLabelList.size){
@@ -116,19 +118,19 @@ fun LineChart(
         }
 
 //        draw x label
-        for(i in 0 until data.size){
-            val xOffset = (xAxisSpacing * i) + xAxisPadding.toPx()
-            drawContext.canvas.nativeCanvas.drawText(
-                xAxisData[i],
-                xOffset,
-                size.height,
-                Paint().apply {
-                    color = Color.Gray.toArgb()
-                    textAlign = Paint.Align.CENTER
-                    textSize = 10.sp.toPx()
-                }
-            )
-        }
+//        for(i in 0 until data.size){
+//            val xOffset = (xAxisSpacing * i) + xAxisPadding.toPx()
+//            drawContext.canvas.nativeCanvas.drawText(
+//                xAxisData[i],
+//                xOffset,
+//                size.height,
+//                Paint().apply {
+//                    color = Color.Gray.toArgb()
+//                    textAlign = Paint.Align.CENTER
+//                    textSize = 10.sp.toPx()
+//                }
+//            )
+//        }
 
 //        draw y label
         for(i in 0 until yAxisLabelList.size){
@@ -143,15 +145,21 @@ fun LineChart(
                 }
             )
         }
+        val lastOffset = offsetList.get(offsetList.lastIndex)
+        drawCircle(
+            color = colorChart,
+            radius = 3.dp.toPx(),
+            center = lastOffset
+        )
 
 //        draw point for each offset
-        offsetList.forEachIndexed{ index, offset ->
-            drawCircle(
-                color = colorChart,
-                radius = 3.dp.toPx(),
-                center = offset
-            )
-        }
+//        offsetList.forEachIndexed{ index, offset ->
+//            drawCircle(
+//                color = colorChart,
+//                radius = 1.5.dp.toPx(),
+//                center = offset
+//            )
+//        }
 
 //        draw line connect point
         drawPoints(
@@ -164,7 +172,7 @@ fun LineChart(
 //        gradient color
         val gradientPath = Path().apply {
             moveTo(xAxisPadding.toPx() , size.height)
-            for(i in 0 until data.size){
+            for(i in 0 until yAxisData.size){
                 lineTo(offsetList[i].x, offsetList[i].y)
             }
             lineTo(gridWidth, gridHeight)
@@ -183,7 +191,8 @@ fun LineChart(
 @Composable
 fun LineChartComponent(
     name: String,
-    chartData: List<ChartData>,
+    chartData: List<Int>,
+    step: Int = 5,
     colorChart: Color = Color(0xFFFF8343)
 ){
     Box(
@@ -204,9 +213,9 @@ fun LineChartComponent(
         ) {
             Text(text = name)
             LineChart(
-                data = chartData,
+                yAxisData = chartData,
                 height = 190.dp,
-                step = 10,
+                step = step,
                 colorChart = colorChart)
         }
 
@@ -217,15 +226,10 @@ fun LineChartComponent(
 @Composable
 fun PrviewLineChart(){
     val chartData = listOf(
-        ChartData("T", 30),
-        ChartData("W", 25),
-        ChartData("F", 30),
-        ChartData("SA", 20),
-        ChartData("SU", 22),
-        ChartData("M", 13),
+        90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,89,89,89,89,89,89,89,89,89,89,89,90,90,90,89,90,90,90,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,90,90,90,90,89,89,89,89,89,90,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,90,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,88,89,89,89,89,89,89,89,89,89,89,89,88,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,88,89,89,89,89,89,89,89,89,89,89,89,89,88,89,89,89,89,89,89,89,89,89,89,89,89,88,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,88,88,88,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,88,89,89,89,89,89,89,89,89,89,89,89,89,88,89,88,89,89,89,89,89,89,89,89,89,88,89,89,89,89,89,89,89,89,89,89,89,89,88,89,88,88,88,88,88,88,88,89,88,88,88,88,89,88,88,88,88,88,88,88,88,89,88,89,88,89,89,89,89,89,89,89,89,89,89,89,89,88,89,88,88,89,89,89,89,89,89,89,89,88,88,88,88,89,89,89,89,89,89,89,89,89,89,88,88,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,88,88,89,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,88,89,88,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,89,90,89,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,90,91,90,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,91,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,92,93,92,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,94,93,93,93,93,93,93,93,93,93,93,93,93,93,94,93,93,93,93,93,93,93,93,93,93,93,93,93,93,93,94,94,94,94,94,94,94,94,94
     )
     Box(modifier = Modifier.padding(20.dp)){
-        LineChartComponent(name = "Temperature", chartData = chartData)
+        LineChartComponent(name = "Humidity", chartData = chartData, step = 10)
     }
 
 }

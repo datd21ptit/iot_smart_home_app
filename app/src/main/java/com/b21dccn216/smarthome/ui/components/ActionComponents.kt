@@ -1,12 +1,8 @@
 package com.b21dccn216.smarthome.ui.components
 
-import android.util.Log
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.gestures.Orientation
-import androidx.compose.foundation.gestures.draggable
-import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -19,7 +15,6 @@ import androidx.compose.ui.unit.dp
 import com.b21dccn216.smarthome.R
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
-import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,30 +22,29 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.unit.IntOffset
-import androidx.compose.ui.zIndex
 import androidx.constraintlayout.compose.ConstraintLayout
-import kotlin.math.roundToInt
 
 @Composable
 fun ActionBox(
     @DrawableRes icon: Int,
-    deviceName: String
+    deviceName: String,
+    onClick: ()->Unit,
+    isOn: Boolean,
 ){
-    var isOn by remember {
-        mutableStateOf(false)
-    }
+
     ConstraintLayout(
         modifier = Modifier
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(15))
             .background(color = Color.White)
             .clip(RoundedCornerShape(percent = 15))
             .size(width = 165.dp, 100.dp)
-            .clickable { isOn = !isOn }
+            .clickable{
+                onClick()
+            }
     ){
         val(deviceIcon, deviceText, slideButton) = createRefs()
-        LabelIcon(icon = icon, isOn = isOn,
+        LabelIcon(icon = icon,
+            isOn = isOn,
             modifier = Modifier
                 .constrainAs(deviceIcon){
                     top.linkTo(parent.top)
@@ -69,7 +63,7 @@ fun ActionBox(
             Text(text = deviceName,
                 modifier = Modifier)
 
-            SlideButton(isOn = isOn, onClick = {isOn = !isOn}, modifier = Modifier)
+            SlideButton(isOn = isOn, modifier = Modifier)
         }
 
 
@@ -82,7 +76,6 @@ fun SlideButton(
     width: Int = 60,
     height: Int = 30,
     isOn: Boolean,
-    onClick: () -> Unit
 ) {
 //    Box(
     ConstraintLayout(
@@ -123,8 +116,8 @@ fun PreviewActionBox(){
         .fillMaxSize(), horizontalArrangement = Arrangement.SpaceBetween){
         var isOn by remember { mutableStateOf(false) }
 //        ActionBox()
-        SlideButton(isOn = isOn, onClick = {isOn = !isOn})
-        ActionBox(deviceName = "Light Bulb", icon = R.drawable.lightbulb)
+        SlideButton(isOn = isOn)
+        ActionBox(deviceName = "Light Bulb", icon = R.drawable.lightbulb, onClick = {}, isOn = false)
 
     }
 

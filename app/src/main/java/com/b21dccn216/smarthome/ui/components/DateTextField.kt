@@ -2,12 +2,15 @@ package com.b21dccn216.smarthome.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
@@ -17,6 +20,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -30,32 +34,58 @@ import androidx.compose.ui.window.Popup
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-@Preview(showBackground = true)
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun DatePickerDocked() {
+fun DatePickerDocked(
+    value: String,
+    onDateSelected: (String) -> Unit, // Callback function to pass the selected date
+    onDeselected: ()->Unit
+) {
+    var tmp = value
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
     val selectedDate = datePickerState.selectedDateMillis?.let {
         convertMillisToDate(it)
-    } ?: ""
+    } ?: tmp
+    tmp = ""
+
+    // Trigger the callback with the selected date
+    LaunchedEffect(selectedDate) {
+        if (selectedDate.isNotEmpty()) {
+            onDateSelected(selectedDate)
+        }
+    }
 
     Box(
-        modifier = Modifier.fillMaxWidth().padding(bottom = 12.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 12.dp)
     ) {
         OutlinedTextField(
             value = selectedDate,
             onValueChange = { },
-            label = { Text("DOB") },
+            label = { Text("Choose date") },
             readOnly = true,
             trailingIcon = {
-                IconButton(onClick = { showDatePicker = !showDatePicker }) {
-                    Icon(
-                        imageVector = Icons.Default.DateRange,
-                        contentDescription = "Select date"
-                    )
+                if(selectedDate.isNotEmpty()){
+                    IconButton(onClick = {
+                        onDeselected()
+                        datePickerState.selectedDateMillis = null
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Unselect date"
+                        )
+                    }
+                }else{
+                    IconButton(onClick = { showDatePicker = !showDatePicker }) {
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = "Select date"
+                        )
+                    }
                 }
+
             },
             modifier = Modifier
                 .fillMaxWidth()
@@ -67,10 +97,9 @@ fun DatePickerDocked() {
                 onDismissRequest = { showDatePicker = false },
                 alignment = Alignment.Center
             ) {
-                Box(
+                Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .offset(y = 64.dp)
                         .shadow(elevation = 4.dp)
                         .background(MaterialTheme.colorScheme.surface)
                         .padding(16.dp)
@@ -79,6 +108,9 @@ fun DatePickerDocked() {
                         state = datePickerState,
                         showModeToggle = false
                     )
+                    Button(onClick = { showDatePicker = false }) {
+                        Text("Close")
+                    }
                 }
             }
         }

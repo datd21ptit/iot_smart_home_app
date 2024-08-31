@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
+    id("org.jetbrains.kotlin.plugin.serialization") version "1.8.10"
 }
 
 android {
@@ -59,8 +60,6 @@ dependencies {
     implementation(libs.androidx.ui.graphics)
     implementation(libs.androidx.ui.tooling.preview)
     implementation(libs.androidx.material3)
-    implementation(libs.androidx.navigation.runtime.ktx)
-    implementation(libs.androidx.navigation.compose)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -71,5 +70,20 @@ dependencies {
 
     implementation (libs.androidx.constraintlayout.compose)
 
+//    Retrofi
+    implementation("com.squareup.retrofit2:retrofit:2.9.0")
+    implementation("com.squareup.retrofit2:converter-gson:2.9.0")
+    implementation("com.squareup.okhttp3:okhttp:4.9.3")
+
+//    viewmodel
+    implementation(libs.androidx.lifecycle.viewmodel.compose.android)
+
+//    navigation
+    implementation(libs.androidx.navigation.runtime.ktx)
+    implementation(libs.androidx.navigation.compose)
+
+//  coroutine
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1") // or the latest version
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1") // or the latest version
 
 }
