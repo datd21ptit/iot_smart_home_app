@@ -7,7 +7,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import retrofit2.Response
-import retrofit2.http.Query
 
 class SmartHomeRepository(
     private val apiService: ApiService
