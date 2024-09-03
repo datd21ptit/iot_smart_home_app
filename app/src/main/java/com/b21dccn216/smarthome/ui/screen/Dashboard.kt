@@ -10,6 +10,7 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
@@ -28,7 +29,7 @@ fun DashboardScreen(
     innerPadding: PaddingValues
 ){
     val uiState by viewmodel.uiStateDashboard.collectAsState()
-
+    val options = listOf(500, 1000, 10000, 50000)
     LazyVerticalGrid(
         modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = innerPadding.calculateBottomPadding()),
         columns = GridCells.Fixed(2),
@@ -36,9 +37,9 @@ fun DashboardScreen(
         verticalArrangement = Arrangement.spacedBy(8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        item { SensorInformationBox( sensorType = SensorType.Temperature, value = uiState.temp.toString() ) }
-        item { SensorInformationBox( sensorType = SensorType.Humidity, value = uiState.humid.toString() ) }
-        item { SensorInformationBox( sensorType = SensorType.Light, value = uiState.light.toString() ) }
+        item { SensorInformationBox( sensorType = SensorType.Temperature, value = uiState.listTemp.last().toString() ) }
+        item { SensorInformationBox( sensorType = SensorType.Humidity, value = uiState.listHumid.last().toString() ) }
+        item { SensorInformationBox( sensorType = SensorType.Light, value = uiState.listLight.last().toString() ) }
         Log.d("retrofitD", "CLICK2")
         item {
             ActionBox(icon = R.drawable.lightbulb, deviceName = "Light Bulb",
@@ -77,18 +78,23 @@ fun DashboardScreen(
             LineChartComponent(
                 name = "Light",
                 chartData = uiState.listLight,
-                step = 200,) }
-        item( span = { GridItemSpan(2) }) {
-            LineChartComponent(
-                name = "Temparature",
-                step = 10,
-                chartData = uiState.listTemp) }
+                step = 200,
+            ) }
         item( span = { GridItemSpan(2) }) {
             LineChartComponent(
                 name = "Humidity",
                 chartData = uiState.listHumid,
                 step = 10,
-                colorChart = Color(0xFF179BAE)) }
+                colorChart = Color(0xFF179BAE),
+            )
+        }
+        item( span = { GridItemSpan(2) }) {
+            LineChartComponent(
+                name = "Temparature",
+                step = 10,
+                chartData = uiState.listTemp,
+            ) }
+
 
     }
 }

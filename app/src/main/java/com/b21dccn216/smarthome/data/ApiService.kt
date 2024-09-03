@@ -24,10 +24,10 @@ val retrofit: Retrofit = Retrofit.Builder()
     .build()
 
 interface ApiService {
-    @GET("/data")
+    @GET("/dashboard")
     suspend fun getSensorData() : List<DashboarUiState>
 
-    @POST("/action")
+    @POST("/dashboard")
     suspend fun sendAction(
         @Query("led") led: String,
         @Query("relay") relay: String,

@@ -2,10 +2,10 @@ package com.b21dccn216.smarthome.ui.screen
 
 
 import android.content.Context
+import android.content.Intent
+import android.net.Uri
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.width
@@ -14,7 +14,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.ClickableText
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Divider
@@ -40,9 +42,12 @@ import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
@@ -59,7 +64,9 @@ fun ProfileScreen(
     innerPadding: PaddingValues
 ){
     Column(
-        modifier = modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding())
+        modifier = modifier
+            .fillMaxSize()
+            .padding(bottom = innerPadding.calculateBottomPadding())
 //            .background(color = Color.Gray.copy(alpha = 0.3f))
     ) {
         ImageProfile(modifier = Modifier)
@@ -76,7 +83,7 @@ private fun ImageProfile(
     ) {
         val (backImg, profileImg, whiteBack) = createRefs()
         Image(
-            painter = painterResource(id = R.drawable.ocean),
+            painter = painterResource(id = R.drawable.beach_coastline_aerial_view_nature_forest_4k_wallpaper_3840x2160_uhdpaper_com_434_0_b),
             contentDescription = null,
             modifier = Modifier
                 .fillMaxWidth()
@@ -105,16 +112,38 @@ private fun ImageProfile(
                 modifier = Modifier.wrapContentSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Spacer(modifier = Modifier.height(80.dp))
-                Text(text = "Nguyen Tran Dat",
+                Spacer(modifier = Modifier.height(88.dp))
+                Text(text = "Nguyen Tran Dat - B21DCCN216",
                     style = MaterialTheme.typography.titleMedium
                 )
-                Text(text = "B21DCCN216",
-                    modifier = Modifier.padding(bottom = 8.dp, start = 16.dp, end = 16.dp, top = 8.dp),
-                    textAlign = TextAlign.Center)
-                Text(text = "Link...",
-                    modifier = Modifier.padding(bottom = 16.dp, start = 16.dp, end = 16.dp, top = 8.dp),
-                    textAlign = TextAlign.Center)
+                val context = LocalContext.current
+                IconAndLink(
+                    context = context,
+                    icon = R.drawable.github,
+                    link = "https://github.com/datd21ptit/iot_smart_home_app",
+                    title = "Android Application Source")
+                IconAndLink(
+                    context = context,
+                    icon = R.drawable.github,
+                    link = "https://github.com/datd21ptit/iot_smarthome_server",
+                    title = "System Server Source")
+                IconAndLink(
+                    context = context,
+                    icon = R.drawable.google_drive,
+                    link = "https://drive.google.com/file/d/14SKu1HwlE7bHLRCTTb9T3hE9ka7pCbh4/view?usp=sharing",
+                    title = "Project report drive")
+                IconAndLink(
+                    context = context,
+                    icon = R.drawable.facebook,
+                    link = "https://www.facebook.com/profile.php?id=100023005893756",
+                    title = "Nguyen Tran Dat")
+                IconAndLink(
+                    context = context,
+                    icon = R.drawable.instagram,
+                    link = "https://www.instagram.com/datanddatt/",
+                    title = "nguyen_tran_dat")
+
+                Spacer(modifier = Modifier.height(8.dp))
             }
         }
         CreateImageProfile(
@@ -127,6 +156,36 @@ private fun ImageProfile(
     }
 }
 
+@Composable
+fun IconAndLink(
+    context: Context,
+    icon: Int,
+    link: String,
+    title: String
+){
+    Row(
+        modifier = Modifier.padding(8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Icon( painter = painterResource(id = icon), contentDescription = null,
+            modifier = Modifier.size(24.dp))
+        val annotatedString = buildAnnotatedString {
+            pushStringAnnotation(title, annotation = link)
+            withStyle(style = SpanStyle(color = MaterialTheme.colorScheme.primary)){
+                append(title)
+            }
+        }
+        ClickableText(text = annotatedString,
+            onClick = {offset ->
+                annotatedString.getStringAnnotations(title, offset, offset)
+                    .firstOrNull()?.let { annotation ->
+                        val intent = Intent(Intent.ACTION_VIEW, Uri.parse(annotation.item))
+                        context.startActivity(intent)
+                    }
+            })
+    }
+}
 
 @Composable
 private fun CreateImageProfile(modifier: Modifier = Modifier) {

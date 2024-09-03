@@ -11,7 +11,6 @@ import com.b21dccn216.smarthome.model.AppState.LOADED
 import com.b21dccn216.smarthome.model.AppState.LOADING
 import com.b21dccn216.smarthome.model.DashboarUiState
 import com.b21dccn216.smarthome.model.Destinations.ACTION_DATA_TABLE
-import com.b21dccn216.smarthome.model.TableResponse
 import com.b21dccn216.smarthome.model.TableUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +32,6 @@ class SmartHomeViewmodel(
 
     private val _uiStateTable = MutableStateFlow(TableUiState())
     val uiStateTable: StateFlow<TableUiState> = _uiStateTable.asStateFlow()
-
 
     private var _currentScreen = MutableStateFlow(DASHBOARD)
     val currentScreen = _currentScreen.asStateFlow()
@@ -140,7 +138,7 @@ class SmartHomeViewmodel(
     fun clickAction(state: DashboarUiState){
         viewModelScope.launch {
             try {
-                val response = repository.senAction(led = state.led, fan = state.fan, relay = state.relay)
+                val response = repository.sendAction(led = state.led, fan = state.fan, relay = state.relay)
                 Log.d("viewmodel", response.toString())
                 if(response.isSuccessful && response.code() == 200){
                     _uiStateDashboard.update { value ->
@@ -177,6 +175,7 @@ class SmartHomeViewmodel(
             )
         }
     }
+
 
 }
 

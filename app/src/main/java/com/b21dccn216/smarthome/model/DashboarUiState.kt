@@ -6,9 +6,6 @@ import com.b21dccn216.smarthome.R
 
 data class DashboarUiState(
 
-    val temp: Int = 0,
-    val humid: Int = 0,
-    val light: Int = 0,
     val led: Int = 0,
     val fan: Int = 0,
     val relay: Int = 0,
