@@ -1,4 +1,4 @@
-package com.b21dccn216.smarthome.data
+package com.b21dccn216.smarthome.network
 
 import com.b21dccn216.smarthome.model.DashboarUiState
 import com.b21dccn216.smarthome.model.TableResponse

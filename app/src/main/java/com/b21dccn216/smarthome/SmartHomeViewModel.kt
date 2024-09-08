@@ -2,11 +2,12 @@ package com.b21dccn216.smarthome
 
 
 import android.util.Log
+import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.b21dccn216.smarthome.model.Destinations.DASHBOARD
 import com.b21dccn216.smarthome.model.Destinations.SENSOR_DATA_TABLE
-import com.b21dccn216.smarthome.data.SmartHomeRepository
+import com.b21dccn216.smarthome.network.SmartHomeRepository
 import com.b21dccn216.smarthome.model.AppState.LOADED
 import com.b21dccn216.smarthome.model.AppState.LOADING
 import com.b21dccn216.smarthome.model.DashboarUiState
@@ -35,30 +36,24 @@ class SmartHomeViewmodel(
 
     private var _currentScreen = MutableStateFlow(DASHBOARD)
     val currentScreen = _currentScreen.asStateFlow()
-//    INIT
+
+
     init {
         viewModelScope.launch {
             _currentScreen.collectLatest{ current ->
-                when(current){
-                    DASHBOARD -> {
-                        while(current == DASHBOARD){
+                while(true) {
+                    when (current) {
+                        DASHBOARD -> {
                             getDashboardData()
-                            delay(2000)
                         }
-                    }
-                    SENSOR_DATA_TABLE -> {
-                        while (current == SENSOR_DATA_TABLE){
+                        SENSOR_DATA_TABLE -> {
                             getTableData()
-                            delay(2000)
                         }
-                    }
-                    ACTION_DATA_TABLE -> {
-                        while (current == ACTION_DATA_TABLE){
+                        ACTION_DATA_TABLE -> {
                             getTableDataAction()
-                            delay(2000)
                         }
                     }
-
+                    delay(2000)
                 }
             }
         }
@@ -73,7 +68,7 @@ class SmartHomeViewmodel(
                 )
             }
             _appState.value = LOADED
-            Log.d("viewmodel", "get sensor data table")
+            Log.d("viewmodel", "get sensor network table")
         }catch (e: Exception){
             Log.e("viewmodel", e.toString())
         }
@@ -127,7 +122,7 @@ class SmartHomeViewmodel(
 //                newValue.copy(listLight = listLight,
 //                    light = listLight[listLight.lastIndex])
 //            }
-//            Log.e("viewmodel", "get Chart data")
+//            Log.e("viewmodel", "get Chart network")
 //        }catch (e: Exception){
 //            Log.e("viewmodel", e.toString())
 //        }

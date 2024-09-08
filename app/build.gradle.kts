@@ -76,7 +76,7 @@ dependencies {
     implementation("com.squareup.okhttp3:okhttp:4.9.3")
 
 //    viewmodel
-    implementation(libs.androidx.lifecycle.viewmodel.compose.android)
+    implementation("androidx.lifecycle:lifecycle-viewmodel-ktx:2.8.5")
 
 //    navigation
     implementation(libs.androidx.navigation.runtime.ktx)
@@ -85,5 +85,8 @@ dependencies {
 //  coroutine
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1") // or the latest version
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1") // or the latest version
+
+//    animation
+    implementation ("com.google.accompanist:accompanist-navigation-animation:0.36.0")
 
 }

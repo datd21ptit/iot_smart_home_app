@@ -1,8 +1,7 @@
-package com.b21dccn216.smarthome.data
+package com.b21dccn216.smarthome.network
 
 import com.b21dccn216.smarthome.model.DashboarUiState
 import com.b21dccn216.smarthome.model.TableResponse
-import kotlinx.coroutines.flow.Flow
 import okhttp3.OkHttpClient
 import retrofit2.Response
 import retrofit2.Retrofit
@@ -12,7 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 private const val BASE_URL =
-    "http://192.168.1.10:3001"
+    "http://192.168.1.9:3001"
 
 /**
  * Use the Retrofit builder to build a retrofit object using a kotlinx.serialization converter

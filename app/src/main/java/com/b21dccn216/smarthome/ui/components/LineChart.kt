@@ -47,7 +47,7 @@ fun LineChart(
     val xAxisPadding = 16.dp
     val yAxisPadding = 16.dp
 
-//    val yAxisData = data.map{it.y}
+//    val yAxisData = network.map{it.y}
     
     val offsetList = remember { mutableListOf<Offset>() }
 
@@ -96,10 +96,10 @@ fun LineChart(
             end = Offset(xAxisPadding.toPx(), gridHeight),
             strokeWidth = 2f
         )
-//        for(i in 0 until data.size){
+//        for(i in 0 until network.size){
 //            val xOffset = (xAxisSpacing * i) + xAxisPadding.toPx()
 //            drawLine(
-//                color = if(i == 0 || i == data.size-1) Color.Black else Color.Gray.copy(alpha = 0.3f),
+//                color = if(i == 0 || i == network.size-1) Color.Black else Color.Gray.copy(alpha = 0.3f),
 //                start = Offset(xOffset, 0f),
 //                end = Offset(xOffset, gridHeight),
 //                strokeWidth = 2f
@@ -118,7 +118,7 @@ fun LineChart(
         }
 
 //        draw x label
-//        for(i in 0 until data.size){
+//        for(i in 0 until network.size){
 //            val xOffset = (xAxisSpacing * i) + xAxisPadding.toPx()
 //            drawContext.canvas.nativeCanvas.drawText(
 //                xAxisData[i],

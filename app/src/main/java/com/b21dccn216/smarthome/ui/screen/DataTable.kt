@@ -32,7 +32,6 @@ fun TableScreen(
     tableData: TableResponse
 ) {
     val uiState by viewmodel.uiStateTable.collectAsState()
-
     Column(
         modifier = Modifier
             .padding(top = innerPadding.calculateTopPadding(),

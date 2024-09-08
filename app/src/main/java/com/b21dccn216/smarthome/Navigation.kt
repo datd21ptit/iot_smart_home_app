@@ -1,5 +1,9 @@
 package com.b21dccn216.smarthome
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.List
@@ -17,8 +21,10 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -72,7 +78,7 @@ val items = listOf(
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SmarthomeNavigation(
-    viewmodel: SmartHomeViewmodel,
+    viewmodel: SmartHomeViewmodel = viewModel(factory = AppViewModelProvider.Factory),
     navController: NavHostController = rememberNavController()
 ) {
     val currentScreen by viewmodel.currentScreen.collectAsState()
@@ -86,10 +92,10 @@ fun SmarthomeNavigation(
                     TopAppBar(title = { Text(text = "Dashboard") })
                 }
                 SENSOR_DATA_TABLE -> {
-                    TopAppBar(title = { Text(text = "Sensor data") })
+                    TopAppBar(title = { Text(text = "Sensor table") })
                 }
                 ACTION_DATA_TABLE -> {
-                    TopAppBar(title = { Text(text = "Control data") })
+                    TopAppBar(title = { Text(text = "Control table") })
                 }
                 else -> null
             }
@@ -111,28 +117,68 @@ fun SmarthomeNavigation(
                 navController = navController,
                 startDestination = DASHBOARD.second
             ) {
-                composable(DASHBOARD.second) {
+                composable(DASHBOARD.second,
+                    enterTransition = {
+                        slideInHorizontally(initialOffsetX = { -1000 }) + fadeIn()
+                    },
+                    exitTransition = {
+                         fadeOut()
+                    },
+                ) {
                     DashboardScreen(
                         viewmodel = viewmodel,
                         innerPadding = innerPadding)
                 }
-                composable(SENSOR_DATA_TABLE.second) {
+                composable(SENSOR_DATA_TABLE.second,
+                    enterTransition = {
+                        slideInHorizontally(initialOffsetX = {
+                            val previous = navController.previousBackStackEntry?.destination?.route
+                            when(previous){
+                                DASHBOARD.second -> 1000
+                                else -> -1000
+                            }}) + fadeIn()
+                    },
+                    exitTransition = {
+                        fadeOut()
+                    }) {
+                    val sensorTitleColumn = remember { listOf("Temp", "Humid", "Light") }
+//                    val sensorTableData = remember {  }
                     TableScreen(
                         viewmodel = viewmodel,
-                        titleColumn = listOf("Temp", "Humid", "Light"),
+                        titleColumn = sensorTitleColumn,
                         innerPadding = innerPadding,
                         tableData = uiStateTable.tableSensorData
                     )
                 }
-                composable(ACTION_DATA_TABLE.second) {
+                composable(ACTION_DATA_TABLE.second,
+                    enterTransition = {
+                        slideInHorizontally(initialOffsetX = {
+                            when(navController.previousBackStackEntry?.destination?.route){
+                                PROFILE.second -> -1000
+                                else -> 1000
+                            }
+                        }) + fadeIn()
+                    },
+                    exitTransition = {
+                        fadeOut()
+                    }) {
+                    val actionTitleColumn = remember { listOf("Led", "Fan", "Relay") }
+//                    val actionTableData = remember { a.tableActionData }
+
                     TableScreen(
                         viewmodel = viewmodel,
-                        titleColumn = listOf("Led", "Fan", "Relay"),
+                        titleColumn = actionTitleColumn,
                         innerPadding = innerPadding,
                         tableData = uiStateTable.tableActionData
                     )
                 }
-                composable(PROFILE.second) {
+                composable(PROFILE.second,
+                    enterTransition = {
+                        slideInHorizontally(initialOffsetX = { 1000 }) + fadeIn()
+                    },
+                    exitTransition = {
+                         fadeOut()
+                    }) {
                     ProfileScreen(modifier = Modifier, innerPadding = innerPadding)
                 }
             }

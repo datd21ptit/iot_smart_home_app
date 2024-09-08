@@ -12,11 +12,13 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonColors
+import androidx.compose.material3.ButtonElevation
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -28,7 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 
 
@@ -49,10 +53,11 @@ fun FilterButtonWithDialog(
     }
     Button(
         modifier = Modifier
-            .clip(MaterialTheme.shapes.small)
-            .padding(8.dp),
+            .padding(12.dp)
+            .shadow(elevation = 2.dp, shape = RoundedCornerShape(50)),
+        shape = RoundedCornerShape(50),
         colors = ButtonColors(
-            containerColor = Color(0xFF179BAE),
+            containerColor = Color.White,
             contentColor = Color.Black,
             disabledContainerColor = MaterialTheme.colorScheme.onSurface,
             disabledContentColor = Color.Black
@@ -100,9 +105,6 @@ fun FilterButtonWithDialog(
             }
         )
     }
-
-    // Use selectedFilters and selectedDate to apply filtering logic
-    // ...
 }
 
 
@@ -122,9 +124,11 @@ fun FillterDialog(
             "Clear All",
             color = Color.Red.copy(alpha = 0.5f),
             style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.padding(bottom = 8.dp).clickable {
-                onClearALl()
-            })
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .clickable {
+                    onClearALl()
+                })
         HorizontalDivider()
         // Filter options for rows
         for (row in 0..2) {
@@ -145,4 +149,22 @@ fun FillterDialog(
         // Date picker
 
     }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+fun Preis(){
+    Row (modifier = Modifier.padding(16.dp)){
+        FilterButtonWithDialog(
+            selectedFilters = listOf("", ""),
+            onvalueChange = {_,_ ->},
+            onConfirmClick = {},
+            onDateChange = {},
+            onClearALl = {},
+            selectedDate = "Date",
+            titleColumn = listOf("Column1", "Column2", "Column3"),
+        )
+    }
+
 }
