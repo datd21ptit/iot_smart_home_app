@@ -43,36 +43,37 @@ fun DashboardScreen(
         Log.d("retrofitD", "CLICK2")
         item {
             ActionBox(icon = R.drawable.lightbulb, deviceName = "Light Bulb",
-                isOn = uiState.led == 1,
+                isOn = uiState.led == "on",
                 onClick = {
-                    viewmodel.clickAction(
-                        DashboarUiState(
-                            led = 1-uiState.led,
-                            fan = uiState.fan,
-                            relay = uiState.relay))
+                    if(uiState.led == "on"){
+                        viewmodel.clickAction(device = "led", "off")
+                    }else{
+                        viewmodel.clickAction(device = "led", "on")
+                    }
                 }
             )
         }
         item {
             ActionBox(icon = R.drawable.fan, deviceName = "Fan",
-                isOn = uiState.fan == 1,
+                isOn = uiState.fan == "on",
                 onClick = {
-                    viewmodel. clickAction(DashboarUiState(
-                        led = uiState.led,
-                        fan = 1- uiState.fan,
-                        relay = uiState.relay))
+                    if(uiState.fan == "on"){
+                        viewmodel.clickAction(device = "fan", "off")
+                    }else{
+                        viewmodel.clickAction(device = "fan", "on")
+                    }
                 }
             )
         }
         item {
             ActionBox(icon = R.drawable.fan, deviceName = "Relay",
-                isOn = uiState.relay == 1,
+                isOn = uiState.relay == "on",
                 onClick = {
-                    Log.d("retrofitD", "CLICK")
-                    viewmodel.clickAction(DashboarUiState(
-                        led = uiState.led,
-                        fan = uiState.fan,
-                        relay = 1-uiState.relay))
+                    if(uiState.relay == "on"){
+                        viewmodel.clickAction(device = "relay", "off")
+                    }else{
+                        viewmodel.clickAction(device = "relay", "on")
+                    }
                 }) }
         item( span = { GridItemSpan(2) }) {
             LineChartComponent(

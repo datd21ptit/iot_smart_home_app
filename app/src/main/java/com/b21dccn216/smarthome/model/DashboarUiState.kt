@@ -6,9 +6,9 @@ import com.b21dccn216.smarthome.R
 
 data class DashboarUiState(
 
-    val led: Int = 0,
-    val fan: Int = 0,
-    val relay: Int = 0,
+    val led: String = "off",
+    val fan: String = "off",
+    val relay: String = "off",
 
     val listTemp: MutableList<Int> = mutableListOf(),
     val listHumid: MutableList<Int> = mutableListOf(),

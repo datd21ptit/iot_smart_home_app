@@ -8,10 +8,10 @@ import retrofit2.Response
 class SmartHomeRepository(
     private val apiService: ApiService
 ) {
-    suspend fun getSensorData(): List<DashboarUiState> = apiService.getSensorData()
+    suspend fun getDashboardUiData(limit: Int): DashboarUiState = apiService.getDashboardData(limit)
 
-    suspend fun sendAction(led: Int, fan: Int, relay: Int): Response<Void>{
-        return apiService.sendAction(led.toString(),relay.toString(), fan.toString())
+    suspend fun sendAction(device: String, state: String): Response<Void>{
+        return apiService.sendAction(device, state)
     }
 
     suspend fun getSensorDataTable(

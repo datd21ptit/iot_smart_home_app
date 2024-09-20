@@ -11,7 +11,7 @@ import retrofit2.http.POST
 import retrofit2.http.Query
 
 private const val BASE_URL =
-    "http://192.168.1.9:3001"
+    "http://192.168.1.7:3001"
 
 /**
  * Use the Retrofit builder to build a retrofit object using a kotlinx.serialization converter
@@ -24,13 +24,14 @@ val retrofit: Retrofit = Retrofit.Builder()
 
 interface ApiService {
     @GET("/dashboard")
-    suspend fun getSensorData() : List<DashboarUiState>
+    suspend fun getDashboardData(
+        @Query("limit") limit: Int
+    ) : DashboarUiState
 
     @POST("/dashboard")
     suspend fun sendAction(
-        @Query("led") led: String,
-        @Query("relay") relay: String,
-        @Query("fan") fan: String
+        @Query("device") device: String,
+        @Query("state") state : String
     ): Response<Void>
 
 //    @GET("/chart")

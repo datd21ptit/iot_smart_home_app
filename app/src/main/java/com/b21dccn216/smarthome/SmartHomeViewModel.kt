@@ -2,7 +2,6 @@ package com.b21dccn216.smarthome
 
 
 import android.util.Log
-import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.b21dccn216.smarthome.model.Destinations.DASHBOARD
@@ -91,7 +90,7 @@ class SmartHomeViewmodel(
 
     private suspend fun getDashboardData(){
         try {
-            val listResult = repository.getSensorData()[0]
+            val listResult = repository.getDashboardUiData(100)
             _uiStateDashboard.update {
                 listResult
             }
@@ -130,19 +129,13 @@ class SmartHomeViewmodel(
 //    }
 
 
-    fun clickAction(state: DashboarUiState){
+    fun clickAction(device: String, state: String){
         viewModelScope.launch {
             try {
-                val response = repository.sendAction(led = state.led, fan = state.fan, relay = state.relay)
-                Log.d("viewmodel", response.toString())
+                val response = repository.sendAction(device, state)
                 if(response.isSuccessful && response.code() == 200){
-                    _uiStateDashboard.update { value ->
-                        value.copy(
-                            led = state.led,
-                            fan = state.fan,
-                            relay = state.relay
-                        )
-                    }
+                    Log.d("viewmodel", state)
+                    Log.d("viewmodel", response.toString())
                 }
             }catch (e: Exception){
                 e.printStackTrace()
