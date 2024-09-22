@@ -44,7 +44,7 @@ fun TableScreen(
                 start = 8.dp, end = 8.dp
             )
     ){
-        var selectedDate by remember{ mutableStateOf(uiState.time) }
+        val selectedDate by remember{ mutableStateOf(uiState.time) }
 //      Search box
         Column(modifier = Modifier
             .shadow(elevation = 2.dp, shape = RoundedCornerShape(15))
