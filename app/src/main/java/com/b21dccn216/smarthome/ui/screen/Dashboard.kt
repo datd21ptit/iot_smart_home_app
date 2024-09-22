@@ -10,13 +10,11 @@ import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.b21dccn216.smarthome.SmartHomeViewmodel
 import com.b21dccn216.smarthome.R
-import com.b21dccn216.smarthome.model.DashboarUiState
 import com.b21dccn216.smarthome.model.SensorType
 import com.b21dccn216.smarthome.ui.components.ActionBox
 import com.b21dccn216.smarthome.ui.components.LineChartComponent
@@ -29,7 +27,6 @@ fun DashboardScreen(
     innerPadding: PaddingValues
 ){
     val uiState by viewmodel.uiStateDashboard.collectAsState()
-    val options = listOf(500, 1000, 10000, 50000)
     LazyVerticalGrid(
         modifier = Modifier.padding(start = 8.dp, end = 8.dp, top = 8.dp, bottom = innerPadding.calculateBottomPadding()),
         columns = GridCells.Fixed(2),

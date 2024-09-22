@@ -162,7 +162,7 @@ fun SmarthomeNavigation(
                     exitTransition = {
                         fadeOut()
                     }) {
-                    val actionTitleColumn = remember { listOf("Led", "Fan", "Relay") }
+                    val actionTitleColumn = remember { listOf("Device", "State") }
 //                    val actionTableData = remember { a.tableActionData }
 
                     TableScreen(

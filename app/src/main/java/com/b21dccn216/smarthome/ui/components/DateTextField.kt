@@ -3,10 +3,12 @@ package com.b21dccn216.smarthome.ui.components
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.DateRange
@@ -28,6 +30,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Popup
@@ -39,7 +42,8 @@ import java.util.Locale
 fun DatePickerDocked(
     value: String,
     onDateSelected: (String) -> Unit, // Callback function to pass the selected date
-    onDeselected: ()->Unit
+    onDeselected: ()->Unit,
+    modifier: Modifier
 ) {
     var tmp = value
     var showDatePicker by remember { mutableStateOf(false) }
@@ -55,17 +59,20 @@ fun DatePickerDocked(
             onDateSelected(selectedDate)
         }
     }
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 12.dp)
-    ) {
+    Row(
+        modifier = modifier,
+        verticalAlignment = Alignment.CenterVertically
+    ){
         OutlinedTextField(
             value = selectedDate,
             onValueChange = { },
-            label = { Text("Choose date") },
+            label = { Text("Date",
+                style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                overflow = TextOverflow.Visible
+            ) },
             readOnly = true,
+            shape = RoundedCornerShape(15),
             trailingIcon = {
                 if(selectedDate.isNotEmpty()){
                     IconButton(onClick = {
@@ -88,8 +95,6 @@ fun DatePickerDocked(
 
             },
             modifier = Modifier
-                .fillMaxWidth()
-                .height(64.dp)
         )
 
         if (showDatePicker) {
@@ -114,7 +119,7 @@ fun DatePickerDocked(
                 }
             }
         }
-    }
+        }
 }
 
 fun convertMillisToDate(millis: Long): String {

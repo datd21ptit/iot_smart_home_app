@@ -6,6 +6,8 @@ import com.b21dccn216.smarthome.R
 
 data class DashboarUiState(
 
+//    val listDevice: List<DeviceType> = listOf(DeviceType.LighBulb, DeviceType.Fan, DeviceType.Relay),
+
     val led: String = "off",
     val fan: String = "off",
     val relay: String = "off",
@@ -14,6 +16,28 @@ data class DashboarUiState(
     val listHumid: MutableList<Int> = mutableListOf(),
     val listLight: MutableList<Int> = mutableListOf()
 )
+
+sealed class DeviceType(
+    val icon: Int,
+    val name: String,
+    val state: String,
+){
+    data object LighBulb : DeviceType(
+        icon = R.drawable.lightbulb,
+        name = "led",
+        state = "off"
+    )
+    data object Fan : DeviceType(
+        icon = R.drawable.fan,
+        name = "fan",
+        state = "off"
+    )
+    data object Relay : DeviceType(
+        icon = R.drawable.fan,
+        name = "relay",
+        state = "off"
+    )
+}
 
 sealed class SensorType(
     val icon: Int,

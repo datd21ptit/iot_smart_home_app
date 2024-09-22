@@ -42,19 +42,22 @@ interface ApiService {
     @GET("table/sensor")
     suspend fun getSensorTable(
         @Query("page") page: String,
+        @Query("limit") limit: String,
         @Query("temp") temp: String,
         @Query("humid") humid: String,
         @Query("light") light: String,
         @Query("time") time: String,
+        @Query("sort") sort: List<String>
     ): TableResponse
 
     @GET("table/action")
     suspend fun getActionTable(
         @Query("page") page: String,
-        @Query("temp") led:String,
-        @Query("humid") fan: String,
-        @Query("light") relay: String,
+        @Query("limit") limit: String,
+        @Query("device") device:String,
+        @Query("state") state: String,
         @Query("time") time: String,
+        @Query("sort") sort: List<String>
     ): TableResponse
 }
 

@@ -143,7 +143,8 @@ fun FillterDialog(
         DatePickerDocked(
             value = selectedDate,
             onDateSelected = {onDateSelected(it)},
-            onDeselected = {onDeselected()}
+            onDeselected = {onDeselected()},
+            modifier = Modifier
         )
         HorizontalDivider()
         // Date picker

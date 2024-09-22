@@ -11,6 +11,7 @@ import com.b21dccn216.smarthome.model.AppState.LOADED
 import com.b21dccn216.smarthome.model.AppState.LOADING
 import com.b21dccn216.smarthome.model.DashboarUiState
 import com.b21dccn216.smarthome.model.Destinations.ACTION_DATA_TABLE
+import com.b21dccn216.smarthome.model.SortOrder
 import com.b21dccn216.smarthome.model.TableUiState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -52,7 +53,7 @@ class SmartHomeViewmodel(
                             getTableDataAction()
                         }
                     }
-                    delay(2000)
+                    delay(1500)
                 }
             }
         }
@@ -67,7 +68,7 @@ class SmartHomeViewmodel(
                 )
             }
             _appState.value = LOADED
-            Log.d("viewmodel", "get sensor network table")
+            Log.d("viewmodel", "get sensor table")
         }catch (e: Exception){
             Log.e("viewmodel", e.toString())
         }
@@ -102,31 +103,6 @@ class SmartHomeViewmodel(
         }
     }
 
-//    private suspend fun getChartData(){
-//        try {
-//            val listTemp = repository.getChartData("temp").toMutableList()
-//            listTemp.removeIf{ it == 0}
-//            _uiStateDashboard.update { newValue ->
-//                newValue.copy(listTemp = listTemp,
-//                    temp = listTemp[listTemp.lastIndex])
-//            }
-//            val listHumid = repository.getChartData("humid").toMutableList()
-//            listHumid.removeIf{ it == 0}
-//            _uiStateDashboard.update { newValue ->
-//                newValue.copy(listHumid = listHumid,
-//                    humid = listHumid[listHumid.lastIndex])
-//            }
-//            val listLight = repository.getChartData("light").toMutableList()
-//            _uiStateDashboard.update { newValue ->
-//                newValue.copy(listLight = listLight,
-//                    light = listLight[listLight.lastIndex])
-//            }
-//            Log.e("viewmodel", "get Chart network")
-//        }catch (e: Exception){
-//            Log.e("viewmodel", e.toString())
-//        }
-//
-//    }
 
 
     fun clickAction(device: String, state: String){
@@ -134,6 +110,14 @@ class SmartHomeViewmodel(
             try {
                 val response = repository.sendAction(device, state)
                 if(response.isSuccessful && response.code() == 200){
+                    _uiStateDashboard.update {
+                        when(device){
+                            "led" -> it.copy(led = state).also { Log.e("viewmodel", "led") }
+                            "fan" -> it.copy(fan = state).also { Log.e("viewmodel", "fam") }
+                            "relay" -> it.copy(relay = state).also { Log.e("viewmodel", "relay") }
+                            else -> {it}
+                        }
+                    }
                     Log.d("viewmodel", state)
                     Log.d("viewmodel", response.toString())
                 }
@@ -147,6 +131,8 @@ class SmartHomeViewmodel(
         _currentScreen.value = screen
         _uiStateTable.update { value ->
             value.copy(
+                sort = listOf(SortOrder.NO_SORT, SortOrder.NO_SORT, SortOrder.NO_SORT),
+                sortTime = SortOrder.NO_SORT,
                 page = "1",
                 row = listOf("", "", ""),
                 time = "",
@@ -159,8 +145,31 @@ class SmartHomeViewmodel(
             value.copy(
                 page = state.page,
                 row = state.row,
-                time = state.time
+                time = state.time,
+                limit = state.limit
             )
+        }
+    }
+
+    fun ChangeOrder(index: Int){
+        if (index == -1){
+            _uiStateTable.update { it ->
+                it.copy(sortTime = toggleSort(it.sortTime))
+            }
+        }else{
+            val sort = _uiStateTable.value.sort.toMutableList()
+            sort[index] = toggleSort(sort[index])
+            _uiStateTable.update { it ->
+                it.copy(sort = sort)
+            }
+        }
+    }
+
+    fun toggleSort(currentSortOrder: SortOrder): SortOrder {
+        return when (currentSortOrder) {
+            SortOrder.NO_SORT -> SortOrder.ASC
+            SortOrder.ASC -> SortOrder.DESC
+            SortOrder.DESC -> SortOrder.NO_SORT
         }
     }
 
