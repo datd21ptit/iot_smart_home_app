@@ -102,7 +102,6 @@ private fun ImageProfile(
                 .padding(8.dp)
                 .shadow(elevation = 5.dp, shape = RoundedCornerShape(15))
                 .clip(RoundedCornerShape(15))
-//                .background(color = Color.White, shape = RoundedCornerShape(15))
                 .constrainAs(whiteBack) {
                     top.linkTo(horizontalGuiline)
                 },
@@ -110,7 +109,7 @@ private fun ImageProfile(
         ){
             Column(
                 modifier = Modifier.wrapContentSize(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
                 Spacer(modifier = Modifier.height(88.dp))
                 Text(text = "Nguyen Tran Dat - B21DCCN216",
@@ -166,7 +165,7 @@ fun IconAndLink(
     Row(
         modifier = Modifier.padding(8.dp),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         Icon( painter = painterResource(id = icon), contentDescription = null,
             modifier = Modifier.size(24.dp))
