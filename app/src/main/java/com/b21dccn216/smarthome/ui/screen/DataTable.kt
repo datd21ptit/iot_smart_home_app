@@ -5,10 +5,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.*
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material3.Icon
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
@@ -24,9 +21,9 @@ import com.b21dccn216.smarthome.R
 import com.b21dccn216.smarthome.SmartHomeViewmodel
 import com.b21dccn216.smarthome.model.SortOrder
 import com.b21dccn216.smarthome.model.TableResponse
-import com.b21dccn216.smarthome.ui.components.DatePickerDocked
-import com.b21dccn216.smarthome.ui.components.DropDownPicker
+import com.b21dccn216.smarthome.ui.components.DateAndLimit
 import com.b21dccn216.smarthome.ui.components.PageButtons
+import com.b21dccn216.smarthome.ui.components.SearchBox
 
 //const val column1Weight = .4f
 //const val column2Weight = .7f
